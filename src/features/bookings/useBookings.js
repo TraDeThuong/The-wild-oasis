@@ -25,7 +25,7 @@ export function useBookings () {
 
 
     // USE QUERY
-    const {isLoading, data: data, error} = useQuery ({
+    const {isLoading, data, error} = useQuery ({
             queryKey : ['bookings', filter, sortBy, page],
             queryFn : ()=> getBookings ({filter, sortBy, page}),
             staleTime: 0

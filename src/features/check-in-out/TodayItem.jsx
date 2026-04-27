@@ -2,10 +2,10 @@ import styled from "styled-components";
 import Tag from "../../ui/Tag"
 import {Flag} from "../../ui/Flag"
 import Button from "../../ui/Button"
-import Spinner from "../../ui/Spinner";
+// import Spinner from "../../ui/Spinner";
 import { useNavigate } from "react-router-dom";
 import CheckoutButton from "./CheckoutButton"
-import { useCheckout } from "./useCheckout";
+// import { useCheckout } from "./useCheckout";
 
 const StyledTodayItem = styled.li`
   display: grid;
@@ -29,7 +29,7 @@ const Guest = styled.div`
 export default function TodayItem({activity}) {
   const {id, status, Guests, numNights} = activity;
   const navigate = useNavigate ()
-  const {checkout, isCheckingOut} = useCheckout()
+  // const {checkout, isCheckingOut} = useCheckout()
 
   if (!Guests) return null;
   

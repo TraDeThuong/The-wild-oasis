@@ -1,5 +1,4 @@
 import styled, { css } from "styled-components";
-import Button from "./Button";
 import { useSearchParams } from "react-router-dom";
 
 const StyledFilter = styled.div`

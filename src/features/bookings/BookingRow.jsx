@@ -9,7 +9,6 @@ import { formatDistanceFromNow } from "../../utils/helpers";
 import { useNavigate } from "react-router-dom";
 import Menus from "../../ui/Menus";
 import { HiArrowDownOnSquare, HiArrowUpOnSquare, HiTrash, HiXCircle } from "react-icons/hi2";
-import BookingDataBox from "./BookingDataBox"
 import { useCheckout } from "../check-in-out/useCheckout";
 import { useDeleteBooking } from "./useDeleteBooking";
 import Modal from "../../ui/Modal";
@@ -45,11 +44,11 @@ const Amount = styled.div`
 function BookingRow({booking}) {
   const {
     id: bookingId,
-    created_at,
+    // created_at,
     startDate,
     endDate,
     numNights,
-    numGuests,
+    // numGuests,
     totalPrice,
     status,
     Guests,

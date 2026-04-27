@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast"
 
 import Input from "../../ui/Input";
@@ -37,7 +37,7 @@ function CreateCabinForm() {
   };
 
   function onError (errors) {
-    // console.log (errors)
+    console.log (errors)
   }
 
   return (

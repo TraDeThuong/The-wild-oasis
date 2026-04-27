@@ -1,6 +1,5 @@
 import styled from "styled-components";
 import { formatCurrency } from "../../utils/helpers";
-import { useState } from "react";
 import CreateCabinForm from "./CreateCabinForm";
 import { useDeleteCabin } from "./useDeleteCabin";
 import { HiPencil, HiSquare2Stack, HiTrash } from "react-icons/hi2";
@@ -50,9 +49,9 @@ const Discount = styled.div`
 `;
 
 export default function CabinRow({cabin}) {
-  const [showForm, setShowForm] = useState (false)
+  // const [showForm, setShowForm] = useState (false)
   const {isDeleting, deleteCabin} = useDeleteCabin()
-  const {isCreating, createCabin} = useCreateCabin();
+  const { createCabin} = useCreateCabin();
 
   const {id: cabinID ,name, maxCapacity, regularPrice, discount, image, description} = cabin;
 

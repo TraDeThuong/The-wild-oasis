@@ -33,7 +33,7 @@ function CheckinBooking() {
 
 
   useEffect(() => {
-    setConfirmPaid (booking ?. isPaid ?? false)
+    setConfirmPaid(booking?.isPaid ?? false)
   } , [booking])
 
   const {checkin, isCheckingIn } = useCheckin()
