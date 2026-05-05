@@ -1,5 +1,8 @@
 # The Wild Oasis
 
+Link: https://tra-the-wild-oasis.netlify.app
+
+
 ## Mô tả dự án
 
 The Wild Oasis là một ứng dụng web quản lý resort/khách sạn được xây dựng bằng React.js. Ứng dụng cho phép quản lý đặt phòng, cabin, khách hàng, và các chức năng quản trị khác. Đây là dự án học tập từ khóa học React trên Udemy.
