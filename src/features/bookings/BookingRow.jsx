@@ -41,7 +41,7 @@ const Amount = styled.div`
   font-weight: 500;
 `;
 
-function BookingRow({booking}) {
+function BookingRow({booking = {}}) {
   const {
     id: bookingId,
     // created_at,
@@ -69,6 +69,16 @@ function BookingRow({booking}) {
     "checked-out": "silver",
   };
 
+  const startDateObj = startDate ? new Date(startDate) : null;
+  const endDateObj = endDate ? new Date(endDate) : null;
+  const formattedStatus = status ? status.replace("-", " ") : "unknown";
+  const formattedStartDate = startDateObj
+    ? format(startDateObj, "MMM dd yyyy")
+    : "Unknown";
+  const formattedEndDate = endDateObj
+    ? format(endDateObj, "MMM dd yyyy")
+    : "Unknown";
+
   return (
     <Table.Row>
       <Cabin>{cabinName}</Cabin>
@@ -80,18 +90,18 @@ function BookingRow({booking}) {
 
       <Stacked>
         <span>
-          {isToday(new Date(startDate))
+          {startDateObj && isToday(startDateObj)
             ? "Today"
             : formatDistanceFromNow(startDate)}{" "}
-          &rarr; {numNights} night stay
+          &rarr; {numNights ?? "-"} night stay
         </span>
         <span>
-          {format(new Date(startDate), "MMM dd yyyy")} &mdash;{" "}
-          {format(new Date(endDate), "MMM dd yyyy")}
+          {formattedStartDate} &mdash;{" "}
+          {formattedEndDate}
         </span>
       </Stacked>
 
-      <Tag type={statusToTagName[status]}>{status.replace("-", " ")}</Tag>
+      <Tag type={statusToTagName[status] ?? "silver"}>{formattedStatus}</Tag>
 
       <Amount>{formatCurrency(totalPrice)}</Amount>
 

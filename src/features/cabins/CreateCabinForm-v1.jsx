@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast"
 
 import Input from "../../ui/Input";
@@ -29,7 +29,7 @@ function CreateCabinForm() {
 
   const {register, handleSubmit, reset, getValues, formState } = useForm();
   const {errors} = formState;
-  console.log (errors);
+  // console.log (errors);
 
   function onSubmit(data){
     console.log (data)

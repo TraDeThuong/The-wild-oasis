@@ -8,8 +8,11 @@ import { useSignup } from "./useSignup";
 // Email regex: /\S+@\S+\.\S+/
 
 function SignupForm() {
+
   const {signup, isLoading: isSignupLoading} = useSignup()
+
   const {register, formState, getValues, handleSubmit, reset} = useForm()
+  
   const {errors} = formState;
 
   function onSubmit ({fullName, email, password}) {
