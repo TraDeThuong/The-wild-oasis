@@ -1,39 +1,41 @@
 import { PAGE_SIZE } from "../utils/constants";
 import { getToday } from "../utils/helpers";
 import supabase from "./supabase";
+import { differenceInDays, eachDayOfInterval } from "date-fns";
+import { createGuest } from "./apiGuests";
 
-
-export async function getBookings ({filter, sortBy, page}) {
-   let query = supabase
-    .from ("Bookings")
-    .select("id, created_at, startDate, endDate, numNights, numGuests, status, totalPrice, Cabins(name), Guests(fullName, email)", 
-      {count: "exact"}
+export async function getBookings({ filter, sortBy, page }) {
+  let query = supabase
+    .from("Bookings")
+    .select(
+      "id, created_at, startDate, endDate, numNights, numGuests, status, totalPrice, Cabins(name), Guests(fullName, email)",
+      { count: "exact" },
     );
 
-    // FILTER 
-    if (filter) query = query.eq(filter.field, filter.value)
+  // FILTER
+  if (filter) query = query.eq(filter.field, filter.value);
 
-    // SORT
-    if (sortBy) 
-      query = query.order (sortBy.field, {
-        ascending: sortBy.direction === "asc"
-    } )
+  // SORT
+  if (sortBy)
+    query = query.order(sortBy.field, {
+      ascending: sortBy.direction === "asc",
+    });
 
-    //PAGINATION
-    if (page) {
-      const from = (page - 1) * PAGE_SIZE
-      const to = from + PAGE_SIZE - 1
-      query = query.range(from, to)
-    }
-
-   const {data, error, count} = await query
-
-  if (error) {
-    console.error (error);
-    throw new Error ("Bookings could not be loaded");
+  //PAGINATION
+  if (page) {
+    const from = (page - 1) * PAGE_SIZE;
+    const to = from + PAGE_SIZE - 1;
+    query = query.range(from, to);
   }
 
-  return {data, count}
+  const { data, error, count } = await query;
+
+  if (error) {
+    console.error(error);
+    throw new Error("Bookings could not be loaded");
+  }
+
+  return { data, count };
 }
 
 export async function getBooking(id) {
@@ -52,7 +54,7 @@ export async function getBooking(id) {
 }
 
 // Returns all BOOKINGS that are were created after the given date. Useful to get bookings created in the last 30 days, for example.
-// date: ISO string 
+// date: ISO string
 export async function getBookingsAfterDate(date) {
   const { data, error } = await supabase
     .from("Bookings")
@@ -91,7 +93,7 @@ export async function getStaysTodayActivity() {
     .from("Bookings")
     .select("*, Guests(fullName, nationality, countryFlag)")
     .or(
-      `and(status.eq.unconfirmed,startDate.eq.${getToday()}),and(status.eq.checked-in,endDate.eq.${getToday()})`
+      `and(status.eq.unconfirmed,startDate.eq.${getToday()}),and(status.eq.checked-in,endDate.eq.${getToday()})`,
     )
     .order("created_at");
 
@@ -130,4 +132,104 @@ export async function deleteBooking(id) {
     throw new Error("Booking could not be deleted");
   }
   return data;
+}
+
+export async function createBooking(newBooking) {
+  const { data, error } = await supabase
+    .from("Bookings")
+    .insert([newBooking])
+    .select();
+
+  if (error) {
+    console.error(error);
+    throw new Error("Booking could not be created");
+  }
+
+  return data?.[0];
+}
+
+export async function getBookedDatesByCabinId(cabinId) {
+  let today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+  today = today.toISOString();
+
+  // Getting all bookings
+  const { data, error } = await supabase
+    .from("Bookings")
+    .select("*")
+    .eq("cabinID", cabinId)
+    .or(`startDate.gte.${today},status.eq."checked-in"`);
+
+  if (error) {
+    console.error(error);
+    throw new Error("Bookings could not get loaded");
+  }
+
+  // Converting to actual dates to be displayed in the date picker
+  const bookedDates = data
+    .map((booking) => {
+      return eachDayOfInterval({
+        start: new Date(booking.startDate),
+        end: new Date(booking.endDate),
+      });
+    })
+    .flat();
+
+  return bookedDates;
+}
+
+function getFlagUrl(countryCode) {
+  return `https://flagcdn.com/w40/${countryCode.toLowerCase()}.png`;
+}
+
+export async function createBookingWithGuest(data) {
+  // 1. Create guest
+  const guest = await createGuest({
+    fullName: data.fullName,
+    email: data.email,
+    nationality: data.nationality,
+    nationalID: data.nationalID,
+    countryFlag: getFlagUrl(data.nationality),
+    created_at: new Date().toISOString(),
+  });
+
+  // 2. GET CABIN DATA (🔥 IMPORTANT FIX)
+  const { data: cabin, error } = await supabase
+    .from("Cabins")
+    .select("regularPrice, discount")
+    .eq("id", data.cabinID)
+    .single();
+
+  if (error) throw new Error("Cabin not found");
+
+  // 3. Calculate nights
+  const startDate = new Date(data.startDate);
+  const endDate = new Date(data.endDate);
+  const numNights = differenceInDays(endDate, startDate);
+
+  if (!data.startDate || !data.endDate || isNaN(numNights) || numNights <= 0) {
+    throw new Error("Booking dates are invalid");
+  }
+
+  // 4. REAL price calculation
+  const cabinPrice =
+    numNights * ((cabin.regularPrice ?? 0) - (cabin.discount ?? 0));
+
+  // 5. Create booking
+  const booking = await createBooking({
+    cabinID: Number(data.cabinID),
+    guestID: guest.id,
+
+    status: data.status ?? "unconfirmed",
+
+    startDate: data.startDate,
+    endDate: data.endDate,
+
+    numGuests: Number(data.numGuests),
+
+    numNights,
+    totalPrice: cabinPrice,
+  });
+
+  return booking;
 }

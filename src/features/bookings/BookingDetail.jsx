@@ -98,9 +98,10 @@ function BookingDetail() {
               </Button>}
 
           <Button variation="secondary" onClick={moveBack}>
-            Back
+            Back 
           </Button>
         </ButtonGroup>
+
     </>
   );
 }

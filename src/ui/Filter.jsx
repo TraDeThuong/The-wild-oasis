@@ -42,9 +42,10 @@ export default function Filter({filterField, options}) {
   const currentFilter = searchParams.get (filterField) || options.at(0).value
 
   function handleClick (value) {
-    searchParams.set (filterField, value); // Set "discount" param in URL (e.g. ?discount=all)
-    if (searchParams.get ("page")) searchParams.set ("page", 1)
-    setSearchParams({ [filterField]: value }) // Update the URL with new params
+    const nextSearchParams = new URLSearchParams(searchParams)
+    nextSearchParams.set(filterField, value)
+    if (nextSearchParams.get("page")) nextSearchParams.set("page", 1)
+    setSearchParams(nextSearchParams)
   }
   // console.log("render filter", options);
   return (
